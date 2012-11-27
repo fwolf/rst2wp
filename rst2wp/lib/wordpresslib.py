@@ -235,6 +235,7 @@ class WordPressPost():
         self.user = user or ''  # N.B. userid as string
         self.allowPings = allowPings or False
         self.allowComments = allowComments or False
+        self.name = ''
 
 
 def wordpress_call(func):
@@ -282,6 +283,7 @@ class WordPressClient():
 
         postObj.categories      = categories
         postObj.allowPings      = post['mt_allow_pings'] == 1
+        postObj.name            = post['wp_slug']
         return postObj
 
     def _filterCategory(self, cat):
@@ -408,6 +410,7 @@ class WordPressClient():
             'mt_excerpt' : post.excerpt,
             'mt_keywords': self._marshal_tags_names(post.tags),
             'categories' : self._marshal_categories_names(post.categories),
+            'wp_slug' : post.slug,
         }
 
         if post.date:

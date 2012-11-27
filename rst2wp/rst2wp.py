@@ -519,6 +519,21 @@ class Rst2Wp(Application):
         else:
             new_post_data['date'] = datetime.datetime.strptime(fields['date'], '%Y-%m-%d %H:%M:%S').timetuple()
 
+        # Post slug/post_name
+        # 1. Set bibliographic field :slug: in rst file
+        # 2. New post will auto set if no :slug: field
+        # 3. :slug: come from filename on default
+        # 4. Set :slug: can only change in rst file manually
+        if not self.has_post_info(reader.document, 'slug') or not 'slug' in fields:
+            slug, ext = os.path.splitext(os.path.basename(self.filename))
+            # Convert file name to slug
+            slug_re = re.compile(ur'[ \.\\\/\|\?\*<>:\"\']+', flags=re.UNICODE)
+            slug = unicode(slug_re.sub('-', slug))
+            new_post_data['slug'] = slug
+            self.save_post_info(reader.document, 'slug', slug)
+        else:
+            new_post_data['slug'] = unicode(fields['slug'])
+
         # Publish priority:
         # 1. --publish/--no-publish
         # 2. :publish: yes
